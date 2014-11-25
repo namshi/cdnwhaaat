@@ -4,6 +4,8 @@ This script simply helps you checking
 that some files have been uploaded to
 your CDN.
 
+![cdnwhaat](https://raw.githubusercontent.com/namshi/cdnwhaaat/master/bin/images/cdnwhaat.png)
+
 It is usually common to build some assets
 (optimized images, minified JS) on your server
 and then send them to your CDN -- but better
