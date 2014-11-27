@@ -12,13 +12,13 @@ function getResources(dir, config) {
   var finder    = require('findit')(dir);
   var resources = {};
   
-  finder.on('file', function (file, stat) {
+  finder.on('file', function(file, stat) {
     var url = config.baseUrl + path.relative(dir, file);
     resources[url] = 200;
   });
   
   return new Promise(function(resolve){
-    finder.on('end', function (file, stat) {
+    finder.on('end', function() {
         resolve(resources)
     });
   });
@@ -27,15 +27,15 @@ function getResources(dir, config) {
 /**
  * Smokes the given resources.
  */
-function smoke(resources, cb, currentTry, config) {
+function smoke(resources, currentTry, config) {
   shisha.smoke(resources, function(report){
     var failedResources = _.filter(report, function(resource){
       return !(resource.result);
     })
     
     if (Object.keys(failedResources).length) {
-      cb(failedResources, currentTry, config);
       sleep(config.sleep);
+      retry(failedResources, currentTry, config);
     } else {
       console.log("All resources are on the CDN");
     }
@@ -62,7 +62,7 @@ function retry(failedResources, currentTry, config){
     fail(failedResources);
   } else {
     currentTry += 1;
-    smoke(failedResources, retry, currentTry, config);
+    smoke(failedResources, currentTry, config);
   }  
 }
 
@@ -93,8 +93,8 @@ function run(dir, config) {
   var currentTry = 1;
 
   getResources(dir, config).then(function(resources){
-    var failedResources = smoke(resources, retry, currentTry, config);
-  });
+    smoke(resources, currentTry, config);
+  })
 }
 
 module.exports = run;
