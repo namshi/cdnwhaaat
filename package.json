@@ -1,6 +1,6 @@
 {
   "name": "cdnwhaaat",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Check that your files are on the CDN.",
   "main": "index.js",
   "scripts": {
