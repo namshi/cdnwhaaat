@@ -94,7 +94,7 @@ function run(dir, config) {
 
   getResources(dir, config).then(function(resources){
     smoke(resources, currentTry, config);
-  })
+  }).done()
 }
 
 module.exports = run;
