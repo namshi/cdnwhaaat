@@ -22,8 +22,3 @@ run(dir, {
   tries: argv.tries || 5,
   sleep: argv.sleep || 3
 });  
-
-process.on('uncaughtException', function(e){
-  console.log(e.message)
-  process.exit(8);
-})
