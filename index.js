@@ -26,17 +26,26 @@ function getResources(dir, config) {
 /**
  * Smokes the given resources.
  */
-function smoke(resources, currentTry, config) {
+function smoke(resources, currentTry, config, callback) {
   shisha.smoke(resources, function(report){
-    var failedResources = _.filter(report, function(resource){
+    var failedResources = _(report).filter(function(resource){
       return !(resource.result);
-    })
+    }).map(function(item) {
+      item.url = item.url();
+      item.status = 200;
+      return item;
+    }).value();
 
     if (Object.keys(failedResources).length) {
       setTimeout(function(){
-        retry(failedResources, currentTry, config);
+        try {
+          retry(failedResources, currentTry, config, callback);
+        } catch (err) {
+          callback(err);
+        }
       }, config.sleep * 1000)
     } else {
+      callback();
       console.log("All resources are on the CDN");
     }
   });
@@ -55,14 +64,14 @@ function smoke(resources, currentTry, config) {
  * unavailable, the process exists with a non-zero
  * status code (exception).
  */
-function retry(failedResources, currentTry, config){
+function retry(failedResources, currentTry, config, callback){
   console.log("Attempting to verify everything is on the CDN (" + currentTry + ")");
 
   if (currentTry === config.tries) {
     fail(failedResources);
   } else {
     currentTry += 1;
-    smoke(failedResources, currentTry, config);
+    smoke(failedResources, currentTry, config, callback);
   }
 }
 
@@ -89,11 +98,11 @@ function fail(failedResources) {
  * on the CDN, else this guy is gonna
  * get mad.
  */
-function run(dir, config) {
+function run(dir, config, callback) {
   var currentTry = 1;
 
   getResources(dir, config).then(function(resources){
-    smoke(resources, currentTry, config);
+    smoke(resources, currentTry, config, callback);
   }).done()
 }
 
