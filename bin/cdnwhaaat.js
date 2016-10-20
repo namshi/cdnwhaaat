@@ -21,4 +21,6 @@ run(dir, {
   baseUrl: cdn,
   tries: argv.tries || 5,
   sleep: argv.sleep || 3
-});  
+}, function(err) {
+    if (err) throw err;
+});
